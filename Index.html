@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mello App - Advanced</title>
+    <!-- خطوط جوجل -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ====== CSS ====== */
+        :root {
+            --theme-color: #C5CAE9;
+            --theme-color-light: #e8eaf6;
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --shadow: 4px 4px 0px rgba(0,0,0,0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        /* ====== Retro Window ====== */
+        .retro-window {
+            border: 2px solid #000;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .window-header {
+            background: #e0e0e0;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000;
+        }
+
+        .window-title { font-size: 12px; font-weight: 700; }
+        .window-dots { display: flex; gap: 5px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+
+        .window-content {
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Profile Picture Upload */
+        .avatar-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            background: var(--theme-color);
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            color: white;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            transition: background 0.3s;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        #avatarInput { display: none; }
+
+        /* Profile Fields */
+        .profile-info { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+
+        .field label { font-size: 10px; color: #777; display: block; margin-bottom: 2px; font-weight: 600; }
+        
+        .field input {
+            width: 100%;
+            padding: 6px 8px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: var(--theme-color-light);
+            font-family: 'Quicksand', sans-serif;
+            transition: background 0.3s;
+            outline: none;
+        }
+
+        .field input:focus { border-color: var(--theme-color); }
+
+        .row-fields { display: flex; gap: 8px; }
+        .row-fields .field { flex: 1; }
+
+        /* ====== Pomodoro Timer ====== */
+        .pomodoro-section {
+            background: var(--theme-color-light);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .timer-display {
+            font-size: 40px;
+            font-weight: 700;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .timer-controls { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+
+        .btn-timer {
+            background: var(--theme-color);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #333;
+            font-family: 'Quicksand', sans-serif;
+            transition: transform 0.2s;
+        }
+
+        .btn-timer:hover { transform: scale(1.05); }
+        .btn-timer.reset { background: #ffcdd2; }
+
+        /* ====== To-Do List ====== */
+        .todo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .todo-header h2 { font-size: 18px; }
+
+        .add-btn {
+            background: var(--theme-color);
+            border: 2px solid #000;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+
+        .add-btn:active { transform: translate(2px, 2px); box-shadow: none; }
+
+        /* إدخال مهمة جديدة */
+        .input-group {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Quicksand', sans-serif;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .input-group input:focus { border-color: var(--theme-color); }
+
+        .input-group select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Quicksand', sans-serif;
+            background: white;
+            outline: none;
+        }
+
+        /* قائمة المهام */
+        #task-list { list-style: none; }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border-right: 5px solid var(--theme-color);
+        }
+
+        .task-item.priority-high { border-right-color: #ff5f56; }
+        .task-item.priority-medium { border-right-color: #ffbd2e; }
+        .task-item.priority-low { border-right-color: #27c93f; }
+
+        .task-item input[type="checkbox"] {
+            margin-left: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--theme-color);
+        }
+
+        .task-content { flex: 1; display: flex; flex-direction: column; }
+
+        .task-text { font-size: 14px; font-weight: 600; transition: 0.3s; }
+        .task-text.done { text-decoration: line-through; color: #aaa; }
+
+        .task-date { font-size: 10px; color: #999; margin-top: 2px; }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff5f56;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 5px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .delete-btn:hover { opacity: 1; }
+
+        /* ====== Color Picker ====== */
+        .color-picker-container { margin-top: 20px; text-align: center; border-top: 1px solid #eee; padding-top: 15px; }
+        .color-picker-container p { font-size: 12px; color: #666; margin-bottom: 10px; font-weight: 600; }
+        .color-options { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+        .color-circle {
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+            border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .color-circle:hover { transform: scale(1.2); }
+        .color-circle.active { border: 3px solid #333; transform: scale(1.1); }
+
+        /* ====== Responsive ====== */
+        @media (max-width: 400px) {
+            .window-content { flex-direction: column; align-items: center; }
+            .profile-info { width: 100%; }
+            .row-fields { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 1. البروفايل -->
+        <div class="retro-window">
+            <div class="window-header">
+                <span class="window-title">profile.exe</span>
+                <div class="window-dots">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="avatar-wrapper">
+                    <div class="avatar" id="avatar-box" onclick="document.getElementById('avatarInput').click()">
+                        👤
+                    </div>
+                    <div class="avatar-overlay">📷</div>
+                    <input type="file" id="avatarInput" accept="image/*" onchange="uploadAvatar(event)">
+                </div>
+                <div class="profile-info">
+                    <div class="field">
+                        <label>Full Name</label>
+                        <input type="text" id="fullname" value="Mello User" oninput="saveProfile()">
+                    </div>
+                    <div class="row-fields">
+                        <div class="field">
+                            <label>Grade</label>
+                            <input type="text" id="grade" value="111" oninput="saveProfile()">
+                        </div>
+                        <div class="field">
+                            <label>Birthday</label>
+                            <input type="text" id="birthday" value="July 19" oninput="saveProfile()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. مؤقت بومودورو -->
+        <div class="pomodoro-section">
+            <h3>⏱️ Pomodoro Timer</h3>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div class="timer-controls">
+                <button class="btn-timer" id="startBtn" onclick="toggleTimer()">Start</button>
+                <button class="btn-timer reset" onclick="resetTimer()">Reset</button>
+            </div>
+        </div>
+
+        <!-- 3. قائمة المهام -->
+        <div class="todo-header">
+            <h2>📝 My To-Do List</h2>
+            <span id="taskCount" style="font-size: 12px; color: #777;">0 tasks</span>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="Add a new task..." onkeypress="handleEnter(event)">
+            <select id="prioritySelect">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+            </select>
+            <button class="add-btn" onclick="addTask()">+</button>
+        </div>
+
+        <ul id="task-list"></ul>
+
+        <!-- 4. اختيار الألوان -->
+        <div class="color-picker-container">
+            <p>🎨 Choose Theme Color</p>
+            <div class="color-options" id="colorOptions"></div>
+        </div>
+    </div>
+
+    <script>
+        // ====== JavaScript ======
+
+        // --- 1. إدارة الحالة (State) ---
+        let tasks = [];
+        let profile = { name: "Mello User", grade: "111", birthday: "July 19", avatar: null };
+        let themeColor = "#C5CAE9";
+        
+        // إعدادات المؤقت
+        let timerInterval = null;
+        let timeLeft = 25 * 60; // 25 دقيقة بالثواني
+        let isRunning = false;
+
+        // الألوان المتاحة
+        const colors = ["#C5CAE9", "#E1BEE7", "#FFF9C4", "#F8BBD0", "#B2DFDB", "#FFCCBC", "#FFAB91", "#CE93D8"];
+
+        // --- 2. التهيئة (Initialization) ---
+        window.onload = function() {
+            loadFromStorage();
+            renderColors();
+            renderTasks();
+            updateProfileUI();
+            applyTheme(themeColor);
+            updateTimerDisplay();
+        };
+
+        // --- 3. التخزين المحلي (Local Storage) ---
+        function loadFromStorage() {
+            const savedTasks = localStorage.getItem('mello_tasks');
+            if (savedTasks) tasks = JSON.parse(savedTasks);
+
+            const savedProfile = localStorage.getItem('mello_profile');
+            if (savedProfile) profile = JSON.parse(savedProfile);
+
+            const savedColor = localStorage.getItem('mello_color');
+            if (savedColor) themeColor = savedColor;
+        }
+
+        function saveTasksToStorage() {
+            localStorage.setItem('mello_tasks', JSON.stringify(tasks));
+        }
+
+        function saveProfileToStorage() {
+            localStorage.setItem('mello_profile', JSON.stringify(profile));
+        }
+
+        function saveColorToStorage() {
+            localStorage.setItem('mello_color', themeColor);
+        }
+
+        // --- 4. البروفايل (Profile) ---
+        function saveProfile() {
+            profile.name = document.getElementById('fullname').value;
+            profile.grade = document.getElementById('grade').value;
+            profile.birthday = document.getElementById('birthday').value;
+            saveProfileToStorage();
+        }
+
+        function updateProfileUI() {
+            document.getElementById('fullname').value = profile.name;
+            document.getElementById('grade').value = profile.grade;
+            document.getElementById('birthday').value = profile.birthday;
+            if (profile.avatar) {
+                document.getElementById('avatar-box').style.backgroundImage = `url(${profile.avatar})`;
+                document.getElementById('avatar-box').textContent = "";
+            }
+        }
+
+        function uploadAvatar(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profile.avatar = e.target.result;
+                    saveProfileToStorage();
+                    updateProfileUI();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- 5. المهام (Tasks) ---
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const priority = document.getElementById('prioritySelect').value;
+            const title = input.value.trim();
+
+            if (title !== "") {
+                tasks.push({
+                    id: Date.now(),
+                    title: title,
+                    done: false,
+                    priority: priority,
+                    date: new Date().toLocaleDateString('en-GB')
+                });
+                input.value = "";
+                saveTasksToStorage();
+                renderTasks();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === "Enter") addTask();
+        }
+
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.done = !task.done;
+                saveTasksToStorage();
+                renderTasks();
+            }
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasksToStorage();
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('task-list');
+            const count = document.getElementById('taskCount');
+            list.innerHTML = "";
+
+            const pending = tasks.filter(t => !t.done).length;
+            count.textContent = `${pending} pending / ${tasks.length} total`;
+
+            // ترتيب المهام: العالية الأول
+            const priorityOrder = { high: 1, medium: 2, low: 3 };
+            const sortedTasks = [...tasks].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+            sortedTasks.forEach(task => {
+                const li = document.createElement('li');
+                li.className = `task-item priority-${task.priority}`;
+                
+                li.innerHTML = `
+                    <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                    <div class="task-content">
+                        <span class="task-text ${task.done ? 'done' : ''}">${task.title}</span>
+                        <span class="task-date">${task.date} • ${task.priority.toUpperCase()}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteTask(${task.id})">✕</button>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        // --- 6. الألوان (Theme) ---
+        function renderColors() {
+            const container = document.getElementById('colorOptions');
+            container.innerHTML = "";
+            colors.forEach(color => {
+                const circle = document.createElement('div');
+                circle.className = `color-circle ${color === themeColor ? 'active' : ''}`;
+                circle.style.background = color;
+                circle.onclick = () => applyTheme(color);
+                container.appendChild(circle);
+            });
+        }
+
+        function applyTheme(color) {
+            themeColor = color;
+            document.documentElement.style.setProperty('--theme-color', color);
+            
+            // حساب لون فاتح للخلفيات
+            const lightColor = hexToRgba(color, 0.2);
+            document.documentElement.style.setProperty('--theme-color-light', lightColor);
+
+            saveColorToStorage();
+            renderColors();
+        }
+
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        // --- 7. مؤقت بومودورو (Pomodoro Timer) ---
+        function toggleTimer() {
+            const btn = document.getElementById('startBtn');
+            if (isRunning) {
+                clearInterval(timerInterval);
+                btn.textContent = "Start";
+                isRunning = false;
+            } else {
+                isRunning = true;
+                btn.textContent = "Pause";
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isRunning = false;
+                        btn.textContent = "Start";
+                        alert("⏰ Time's up! Take a break.");
+                        timeLeft = 25 * 60;
+                        updateTimerDisplay();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = 25 * 60;
+            document.getElementById('startBtn').textContent = "Start";
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
